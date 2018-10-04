@@ -1,4 +1,4 @@
-"""EECE4081 URL Configuration
+"""bettingpoolsite URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.0/topics/http/urls/
@@ -15,9 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-import EECE4081TeamDelta.views
+import pool
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', EECE4081TeamDelta.views.index, name='index')
+    path('', pool.views.index, name='index')
 ]
