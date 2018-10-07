@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'pool/css/main.css' %}" >
+    <link rel="stylesheet" type="text/css" href="{% static 'pool/css/bootstrap.min.css' %}" >
+
+{#    <!-- plugins:css -->#}
+{#    <link rel="stylesheet" href="node_modules/mdi/css/materialdesignicons.min.css">#}
+{#    <link rel="stylesheet" href="node_modules/simple-line-icons/css/simple-line-icons.css">#}
+{#    <link rel="stylesheet" href="node_modules/flag-icon-css/css/flag-icon.min.css">#}
+{#    <!-- endinject -->#}
+{#    <!-- plugin css for this page -->#}
+{#    <link rel="stylesheet" href="node_modules/chartist/dist/chartist.min.css" />#}
+{#    <link rel="stylesheet" href="node_modules/jvectormap/jquery-jvectormap.css" />#}
+{#    <!-- End plugin css for this page -->#}
+
+    <!-- inject:css -->
+    <link rel="stylesheet" href="{% static 'pool/css/style.css' %}">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="{% static 'pool/images/favicon.png' %}" />
+
+
+    {% if title %}
+        <title>ReTrans Betting Pool - {{  title }}</title>
+    {% else %}
+        <title>ReTrans Betting Pool</title>
+    {% endif %}
+</head>
+<body>
+
+  <div class="container-scroller">
+    <!-- partial:partials/_navbar.html -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+      <div class="text-center navbar-brand-wrapper">
+        <a class="navbar-brand brand-logo" href="home.html"><img src="{% static 'pool/images/logo.svg' %}" alt="logo"></a>
+        <a class="navbar-brand brand-logo-mini" href="home.html"><img src="{% static 'pool/images/logo_mini.svg' %}" alt="logo"></a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-center">
+        <p class="page-name d-none d-lg-block">{{ current_user }}</p>
+        <ul class="navbar-nav ml-lg-auto">
+          <li class="nav-item dropdown mail-dropdown">
+            <a class="nav-link count-indicator" id="MailDropdown" href="#" data-toggle="dropdown">
+                <i class="icon-envelope-letter icons"></i>
+                <span class="count bg-danger"></span>
+            </a>
+            <div class="dropdown-menu navbar-dropdown mail-notification dropdownAnimation" aria-labelledby="MailDropdown">
+              <a class="dropdown-item" href="#">
+                <div class="sender-img">
+                  <img src="{% static 'pool/images/faces/face6.jpg' %}" alt="">
+                  <span class="badge badge-success">&nbsp;</span>
+                </div>
+                <div class="sender">
+                  <p class="Sende-name">John Doe</p>
+                  <p class="Sender-message">Hey, We have a meeting planned at the end of the day.</p>
+                </div>
+              </a>
+              <a class="dropdown-item" href="#">
+                <div class="sender-img">
+                  <img src="images/faces/face2.jpg" alt="">
+                  <span class="badge badge-success">&nbsp;</span>
+                </div>
+                <div class="sender">
+                  <p class="Sende-name">Leanne Jones</p>
+                  <p class="Sender-message">Can we schedule a call this afternoon?</p>
+                </div>
+              </a>
+              <a class="dropdown-item" href="#">
+                <div class="sender-img">
+                  <img src="images/faces/face3.jpg" alt="">
+                  <span class="badge badge-primary">&nbsp;</span>
+                </div>
+                <div class="sender">
+                  <p class="Sende-name">Stella</p>
+                  <p class="Sender-message">Great presentation the other day. Keep up the good work!</p>
+                </div>
+              </a>
+              <a class="dropdown-item" href="#">
+                <div class="sender-img">
+                  <img src="images/faces/face4.jpg" alt="">
+                  <span class="badge badge-warning">&nbsp;</span>
+                </div>
+                <div class="sender">
+                  <p class="Sende-name">James Brown</p>
+                  <p class="Sender-message">Need the updates of the project at the end of the week.</p>
+                </div>
+              </a>
+              <a href="#" class="dropdown-item view-all">View all</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown notification-dropdown">
+            <a class="nav-link count-indicator" id="notificationDropdown" href="#" data-toggle="dropdown">
+              <i class="icon-speech icons"></i>
+              <span class="count"></span>
+            </a>
+            <div class="dropdown-menu navbar-dropdown preview-list notification-drop-down dropdownAnimation" aria-labelledby="notificationDropdown">
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon">
+                    <i class="icon-info mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject font-weight-medium">Application Error</p>
+                  <p class="font-weight-light small-text">
+                    Just now
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon">
+                    <i class="icon-speech mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject">Settings</p>
+                  <p class="font-weight-light small-text">
+                    Private message
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon">
+                    <i class="icon-envelope mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject">New user registration</p>
+                  <p class="font-weight-light small-text">
+                    2 days ago
+                  </p>
+                </div>
+              </a>
+            </div>
+          </li>
+          <li class="nav-item lang-dropdown d-none d-sm-block">
+            <a class="nav-link" href="#">
+              <p class="mb-0">English <i class="flag-icon flag-icon-gb"></i></p>
+            </a>
+          </li>
+          <li class="nav-item d-none d-sm-block profile-img">
+            <a class="nav-link profile-image" href="#">
+              <img src="{% static 'pool/images/' %}" alt="profile-img">
+              <span class="online-status online bg-success"></span>
+            </a>
+          </li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center ml-auto" type="button" data-toggle="offcanvas">
+          <span class="icon-menu icons"></span>
+        </button>
+      </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <div class="row row-offcanvas row-offcanvas-right">
+        <!-- partial:partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+          <ul class="nav">
+
+            <li class="nav-item nav-category">
+              <span class="nav-link">Navigation</span>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'pool-home' %}">
+                <span class="menu-title">Dashboard</span>
+                <i class="icon-speedometer menu-icon"></i>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'pool-home' %}">
+                <span class="menu-title">Betting Page</span>
+                <i class="icon-speedometer menu-icon"></i>
+              </a>
+            </li>
+
+          </ul>
+        </nav>
+        <!-- partial -->
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+        <!-- content-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+        <footer class="footer">
+          <div class="container-fluid clearfix">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2018 <a href="http://www.bootstrapdash.com/" target="_blank">Bootstrapdash</a>. All rights reserved.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="mdi mdi-heart text-danger">Django</i></span>
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- row-offcanvas ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+
+
+</body>
+</html>

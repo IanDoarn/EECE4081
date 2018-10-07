@@ -19,5 +19,5 @@ import pool
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', pool.views.index, name='index')
+    path('', pool.views.home, name='pool-home')
 ]

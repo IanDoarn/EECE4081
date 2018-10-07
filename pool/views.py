@@ -1,6 +1,6 @@
 from django.shortcuts import render
+from random import choice
 
-def index(request):
-    return render(request, 'index.html')
-
-# Create your views here.
+def home(request):
+    greetings = ['Hello, ', 'Welcome Back, ', 'Hi, ', 'Welcome, ']
+    return render(request, 'pool/home.html', {'title': 'Home', 'current_user': choice(greetings) + 'Ian Doarn' + '...'})
