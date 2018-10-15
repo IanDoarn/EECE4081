@@ -18,13 +18,12 @@ from django.http.response import HttpResponseRedirect
 
 from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth import login, authenticate
-from django.urls.exceptions import NoReverseMatch
     
 def LoginView(request):
     if request.user.is_anonymous or ~request.user.is_authenticated:
         try:
-            username = request.GET['username']
-            password = request.GET['password']
+            username = request.POST['username']
+            password = request.POST['password']
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -34,14 +33,12 @@ def LoginView(request):
         try:
             return redirect(request.GET['next'])
         except MultiValueDictKeyError:
-            return redirect('/accounts/profile/')
-        except NoReverseMatch:
-            return redirect('/accounts/profile/')
-    return render(request, 'registration/login.html')
+            pass
+    if request.user.is_authenticated and ~request.user.is_anonymous:
+        return redirect('/accounts/profile/')
+    return render(request, 'login.html')
     
 def ProfileView(request):
-    if request.user.is_anonymous:
-        return redirect('/accounts/login/?next=' + request.path)
-        #return render(request, 'registration/login.html')
-        #return HttpResponseRedirect('/accounts/login/', {'next':request.path})
-    return render(request, 'profile.html')
+    if request.user.is_authenticated and ~request.user.is_anonymous:
+        return render(request, 'profile.html')
+    return redirect('/accounts/login/?next=' + request.path)

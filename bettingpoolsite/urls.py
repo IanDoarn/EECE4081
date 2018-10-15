@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/', LoginView),
     path('accounts/login/submit', LoginView),
-    path('accounts/profile/', ProfileView)
+    path('accounts/profile/', ProfileView),
+    path('', ProfileView)
 ]
