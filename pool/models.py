@@ -3,32 +3,26 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 
-class BettingRoster(models.Model):
+class Team(models.Model):
     id = models.IntegerField(primary_key=True)
-    team_name = models.CharField(max_length=128)
-    rival_name = models.CharField(max_length=128)
-    is_favorite = models.BooleanField()
-    is_underdog = models.BooleanField()
-    is_home_team = models.BooleanField()
-    tv_station = models.CharField(max_length=10)
-    game_date = models.DateTimeField()
-    is_game_of_the_week = models.BooleanField(default=False)
+    name = models.CharField(max_length=64)
 
 
-class BettingLine(models.Model):
+class Game(models.Model):
     id = models.IntegerField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    line_date = models.DateTimeField(default=timezone.now)
+    favorite_id = models.IntegerField()
+    underdog_id = models.IntegerField()
+    home_id = models.IntegerField()
+    tv = models.CharField(max_length=12)
+    date_time = models.DateTimeField()
+    spread = models.IntegerField()
 
 
-class BettingBet(models.Model):
+class Bet(models.Model):
     id = models.IntegerField(primary_key=True)
-    betting_line_id = models.OneToOneField(BettingLine, on_delete=models.CASCADE)
-    roster_id = models.OneToOneField(BettingRoster, on_delete=models.CASCADE)
-    bet_amount = models.IntegerField()
-
-
-class BettingPlayer(models.Model):
-    id = models.IntegerField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    betting_line_id = models.OneToOneField(BettingLine, on_delete=models.CASCADE)
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
+    game_id = models.OneToOneField(Game, on_delete=models.CASCADE)
+    team_id = models.OneToOneField(Team, on_delete=models.CASCADE)
+    amount = models.FloatField()
+    is_high_risk = models.BooleanField()
+    date_time = models.DateTimeField()
