@@ -18,12 +18,11 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from pool import views as pool_views
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', pool_views.home, name='home'),
     path('accounts/profile/', pool_views.profile, name='profile'),
-    path('login/', auth_views.login, {'template_name': 'registration/login.html'}, name='login'),
-    path('logout/', auth_views.logout, {'next_page': 'login'}, name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('signup/', pool_views.signup, name='signup')
 ]
