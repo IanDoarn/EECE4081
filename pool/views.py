@@ -1,44 +1,30 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
-from django.http.response import HttpResponse
-from django.http.response import HttpResponseRedirect
-
-#def throwaway(request):
-    
-    #try:
-    #    usermail = request.GET['usermail']
-    #    password = request.GET['password']
-    #except MultiValueDictKeyError:
-    #    return render(request, 'login.html')
-    
-    #print(usermail)
-    #print(password)
-    
-    #return render(request, 'index.html')
-
-from django.utils.datastructures import MultiValueDictKeyError
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
-    
-def LoginView(request):
-    if request.user.is_anonymous or ~request.user.is_authenticated:
-        try:
-            username = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-        except MultiValueDictKeyError:
-            pass   
-    if request.user.is_authenticated and ~request.user.is_anonymous:
-        try:
-            return redirect(request.GET['next'])
-        except MultiValueDictKeyError:
-            pass
-    if request.user.is_authenticated and ~request.user.is_anonymous:
-        return redirect('/accounts/profile/')
-    return render(request, 'login.html')
-    
-def ProfileView(request):
-    if request.user.is_authenticated and ~request.user.is_anonymous:
-        return render(request, 'profile.html')
-    return redirect('/accounts/login/?next=' + request.path)
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+
+
+@login_required
+def home(request):
+    return render(request, 'home.html')
+
+
+@login_required
+def profile(request):
+    return render(request, 'accounts/profile.html')
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
