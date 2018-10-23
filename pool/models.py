@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import User
 
 
@@ -7,15 +6,24 @@ class Team(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=64)
 
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return "{} ({})".format(self.name, str(self.id))
+
 
 class Game(models.Model):
     id = models.IntegerField(primary_key=True)
-    favorite_id = models.IntegerField()
-    underdog_id = models.IntegerField()
-    home_id = models.IntegerField()
+    favorite_id = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='favorite_id')
+    underdog_id = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='underdog_id')
+    home_id = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_id')
     tv = models.CharField(max_length=12)
     date_time = models.DateTimeField()
     spread = models.IntegerField()
+
+    def __str__(self):
+        return "{} vs {}".format(self.favorite_id.name, self.underdog_id.name)
 
 
 class Bet(models.Model):
