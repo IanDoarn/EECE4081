@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
+from django.contrib import messages
 
 
 @login_required
@@ -11,6 +12,9 @@ def home(request):
 
 @login_required
 def profile(request):
+    # TODO: Watch video and implement functionality to retrieve bets from Bet table
+    # https://www.youtube.com/watch?v=VxOsCKMStuw&index=48&list=PLw02n0FEB3E3VSHjyYMcFadtQORvl1Ssj
+
     return render(request, 'accounts/profile.html')
 
 
@@ -27,4 +31,3 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
-

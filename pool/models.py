@@ -2,6 +2,30 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class GameUpload(models.Model):
+    title = models.CharField(max_length=128)
+    upload_date = models.DateTimeField()
+    file = models.FileField()
+
+    class Meta:
+        ordering = ["upload_date"]
+
+    def save(self, *args, **kwargs):
+        if self.file:
+            pass
+
+            # TODO: Add functionality here to read CSV file
+            # TODO: and add models to games table
+            # print(self.file.name)
+            # t = Team(id=2000, name=self.file.name)
+            # t.save()
+
+        super(GameUpload, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.file.name
+
+
 class Team(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=64)
@@ -34,3 +58,12 @@ class Bet(models.Model):
     amount = models.FloatField()
     is_high_risk = models.BooleanField()
     date_time = models.DateTimeField()
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    favorite_team = models.OneToOneField(Team, on_delete=models.CASCADE)
+    city = models.CharField(max_length=128)
+
+    def __str__(self):
+        return "{} ({} {})".format(self.user.username, self.user.first_name, self.user.last_name)
