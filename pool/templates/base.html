@@ -14,8 +14,13 @@
   <body>
     <header>
       {% if user.is_authenticated %}
-        <a href="{% url 'logout' %}">logout</a><a> | </a>
+        <a href="{% url 'logout' %}">logout</a>
+        <a> | </a>
         <a href="{% url 'profile' %}">profile</a>
+          {% if user.is_superuser %}
+              <a> | </a>
+              <a href="{% url 'admin:index' %}">admin</a>
+          {% endif %}
       {% else %}
         <a href="{% url 'login' %}">login</a> / <a href="{% url 'signup' %}">signup</a>
       {% endif %}

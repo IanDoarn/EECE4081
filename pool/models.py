@@ -44,7 +44,11 @@ class Game(models.Model):
     home_id = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_id')
     tv = models.CharField(max_length=12)
     date_time = models.DateTimeField()
-    spread = models.IntegerField()
+    spread = models.FloatField()
+    is_game_of_week = models.BooleanField(default=False)
+    underdog_score = models.IntegerField(null=True, blank=True)
+    favorite_score = models.IntegerField(null=True, blank=True)
+    is_tie_breaker = models.BooleanField(default=False)
 
     def __str__(self):
         return "{} vs {}".format(self.favorite_id.name, self.underdog_id.name)
@@ -52,12 +56,18 @@ class Game(models.Model):
 
 class Bet(models.Model):
     id = models.IntegerField(primary_key=True)
-    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
-    game_id = models.OneToOneField(Game, on_delete=models.CASCADE)
-    team_id = models.OneToOneField(Team, on_delete=models.CASCADE)
-    amount = models.FloatField()
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
+    team_id = models.ForeignKey(Team, on_delete=models.CASCADE)
     is_high_risk = models.BooleanField()
     date_time = models.DateTimeField()
+
+    def __str__(self):
+        return "{} ({} {})".format(
+            self.user_id.username,
+            str(self.game_id),
+            self.game_id.date_time
+        )
 
 
 class UserProfile(models.Model):

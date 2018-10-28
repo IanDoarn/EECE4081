@@ -3,4 +3,66 @@
 {% block content %}
     <h1>Home</h1>
     <h2>Welcome, {{ user.username }}!</h2>
+    <style type="text/css">
+        .tg {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .tg td {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            padding: 10px 5px;
+            border-style: solid;
+            border-width: 1px;
+            overflow: hidden;
+            word-break: normal;
+            border-color: black;
+        }
+
+        .tg th {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: normal;
+            padding: 10px 5px;
+            border-style: solid;
+            border-width: 1px;
+            overflow: hidden;
+            word-break: normal;
+            border-color: black;
+        }
+
+        .tg .tg-s268 {
+            text-align: left
+        }
+    </style>
+    <div>
+        <table class="tg">
+            <tr>
+                {% for header in table_headers %}
+                    <th class="tg-s268">{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% for game in games %}
+                <tr>
+                    <td class="tg-s268">{{ game.favorite_id.name }}</td>
+                    <td class="tg-s268">{{ game.spread }}</td>
+                    <td class="tg-s268">{{ game.underdog_id.name }}</td>
+                    <td class="tg-s268">{{ game.tv }}</td>
+                    <td class="tg-s268">{{ game.date_time }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div>
+        <table class="tg">
+            {% for game in games %}
+                {% if game.is_game_of_week %}
+                    <tr>Game of the week: {{ game }}</tr>
+                {% endif %}
+            {%  endfor %}
+        </table>
+    </div>
+
+
 {% endblock %}

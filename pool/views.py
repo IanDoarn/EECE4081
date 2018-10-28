@@ -3,11 +3,27 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from .models import Game, Bet
+from datetime import date, datetime, timedelta
 
+fdow = lambda: datetime.today() - timedelta(days=datetime.today().isoweekday() % 7)
 
 @login_required
 def home(request):
-    return render(request, 'home.html')
+    table_headers = ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time']
+
+    games = Game.objects.filter(date_time__range=(
+        fdow(), fdow() + timedelta(days=7)
+    )).order_by('date_time')
+
+    bets = Bet.objects.filter(date_time__range=(
+        fdow(), fdow() + timedelta(days=7)
+    ))
+
+
+
+
+    return render(request, 'home.html', {'games': games, 'table_headers': table_headers})
 
 
 @login_required
