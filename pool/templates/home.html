@@ -53,16 +53,28 @@
                 </tr>
             {% endfor %}
         </table>
+    	<br>
     </div>
     <div>
         <table class="tg">
             {% for game in games %}
                 {% if game.is_game_of_week %}
-                    <tr>Game of the week: {{ game }}</tr>
+                    <tr><th class="tg-s268">Game of the week: {{ game }}</th></tr>
                 {% endif %}
             {%  endfor %}
         </table>
+    	<br>
     </div>
-
+	<div>
+		<table class="tg">
+			<tr>
+				<th class="tg-s268">Previous Weeks Winners</th>
+			</tr>
+			<tr>
+				<td class="tg-s268">Empty so far</td>
+			</tr>
+		</table>
+		<br>
+	</div>
 
 {% endblock %}

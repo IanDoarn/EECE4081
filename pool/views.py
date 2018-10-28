@@ -8,12 +8,32 @@ from datetime import date, datetime, timedelta
 
 fdow = lambda: datetime.today() - timedelta(days=datetime.today().isoweekday() % 7)
 
+def lastWeek(dt):
+    return stripTime(dt) - timedelta(days=7)
+
+def mondayOfSameWeek(dt):
+    i =    stripTime(dt)
+    j =      i.weekday()
+    return i - timedelta(days=j)
+
+def nextWeek(dt):
+    return stripTime(dt) + timedelta(days=7)
+
+def stripTime(dt):
+    return datetime(dt.year, dt.month, dt.day)
+
+def sundayOfSameWeek(dt):
+    i =    stripTime(dt)
+    j =  6 - i.weekday()
+    k =  i + timedelta(days=j)
+    return datetime(k.year, k.month, k.day, 23, 59, 59, 999999)
+
 @login_required
 def home(request):
     table_headers = ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time']
 
     games = Game.objects.filter(date_time__range=(
-        fdow(), fdow() + timedelta(days=7)
+        mondayOfSameWeek(datetime.today()), sundayOfSameWeek(datetime.today())
     )).order_by('date_time')
 
     bets = Bet.objects.filter(date_time__range=(
