@@ -31,7 +31,6 @@ def sundayOfSameWeek(dt):
 
 @login_required
 def home(request):
-    table_headers = ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time']
 
     games = Game.objects.filter(date_time__range=(
         mondayOfSameWeek(timezone.now()), # lastWeek(timezone.now())
@@ -42,9 +41,38 @@ def home(request):
     for game in games:
         game_ids.append(game.id)
     bets = Bet.objects.filter(game_id__in=game_ids)
+    points = {}
     for bet in bets:
-        print(str(bet))
-
+        try:
+            value = points[bet.user_id]
+        except KeyError:
+            value = 0
+        if bet.game_id.underdog_score != None and bet.game_id.favorite_score != None:
+            if bet.team_id == bet.game_id.underdog_id:
+                if bet.game_id.favorite_score < (bet.game_id.underdog_score + bet.game_id.spread):
+                    value = value + 1
+            else:
+                if bet.game_id.underdog_score < (bet.game_id.favorite_score - bet.game_id.spread):
+                    value = value + 1
+        points[bet.user_id] = value
+    first  = None
+    second = None    
+    for user in points:
+        if  first == None:
+            if points[user] > 0:
+                first  =  user
+        else:
+            if points[user] >= points[first]:
+                second = first
+                first  =  user
+            else:
+                if  second == None:
+                    if points[user] > 0:
+                        second = user
+                else:
+                    if points[user] >= points[second]:
+                        second = user                         
+                        
     return render(
         request, 'home.html',
         {
@@ -52,7 +80,8 @@ def home(request):
                         mondayOfSameWeek(timezone.now()),
                         sundayOfSameWeek(timezone.now())
                      )).order_by('date_time'),
-            'table_headers': table_headers
+            'table_headers': ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time'],
+            'first': first, 'second': second
         }
     )
 
