@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Game, Bet
 from datetime import date, datetime, timedelta
+from django.utils import timezone
 
 fdow = lambda: datetime.today() - timedelta(days=datetime.today().isoweekday() % 7)
 
@@ -20,30 +21,40 @@ def nextWeek(dt):
     return stripTime(dt) + timedelta(days=7)
 
 def stripTime(dt):
-    return datetime(dt.year, dt.month, dt.day)
+    return datetime(dt.year, dt.month, dt.day, tzinfo=dt.tzinfo)
 
 def sundayOfSameWeek(dt):
     i =    stripTime(dt)
     j =  6 - i.weekday()
     k =  i + timedelta(days=j)
-    return datetime(k.year, k.month, k.day, 23, 59, 59, 999999)
+    return datetime(k.year, k.month, k.day, 23, 59, 59, 999999, k.tzinfo)
 
 @login_required
 def home(request):
     table_headers = ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time']
 
     games = Game.objects.filter(date_time__range=(
-        mondayOfSameWeek(datetime.today()), sundayOfSameWeek(datetime.today())
-    )).order_by('date_time')
-
-    bets = Bet.objects.filter(date_time__range=(
-        fdow(), fdow() + timedelta(days=7)
+        mondayOfSameWeek(timezone.now()), # lastWeek(timezone.now())
+        sundayOfSameWeek(timezone.now())  # lastWeek(timezone.now())
+                                          # todo: replace with comments
     ))
+    game_ids = []
+    for game in games:
+        game_ids.append(game.id)
+    bets = Bet.objects.filter(game_id__in=game_ids)
+    for bet in bets:
+        print(str(bet))
 
-
-
-
-    return render(request, 'home.html', {'games': games, 'table_headers': table_headers})
+    return render(
+        request, 'home.html',
+        {
+            'games': Game.objects.filter(date_time__range=(
+                        mondayOfSameWeek(timezone.now()),
+                        sundayOfSameWeek(timezone.now())
+                     )).order_by('date_time'),
+            'table_headers': table_headers
+        }
+    )
 
 
 @login_required
