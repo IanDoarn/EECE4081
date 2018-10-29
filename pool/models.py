@@ -82,3 +82,11 @@ class Bet(models.Model):
             str(self.game_id),
             self.game_id.date_time
         )
+        
+class Season(models.Model):
+    end = models.DateTimeField()
+    name = models.CharField(max_length=128)
+    start = models.DateTimeField()
+    
+    def __str__(self):
+        return  self.name
