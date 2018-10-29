@@ -1,24 +1,38 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.core.validators import FileExtensionValidator
+from .utils.excel_reader import get_games_from_template
 
 class GameUpload(models.Model):
     title = models.CharField(max_length=128)
     upload_date = models.DateTimeField()
-    file = models.FileField()
+    file = models.FileField(validators=[FileExtensionValidator(['xlsx'])])
 
     class Meta:
         ordering = ["upload_date"]
 
     def save(self, *args, **kwargs):
         if self.file:
-            pass
+            games = get_games_from_template(self.file.path, Team.objects.all())
 
-            # TODO: Add functionality here to read CSV file
-            # TODO: and add models to games table
-            # print(self.file.name)
-            # t = Team(id=2000, name=self.file.name)
-            # t.save()
+            _id = max([g.id for g in Game.objects.all()])
+
+            for game in games['games']:
+                _id += 1
+                g = Game(
+                    id=_id,
+                    favorite_id=Team.objects.get(id=game['favorite']),
+                    underdog_id=Team.objects.get(id=game['underdog']),
+                    home_id=Team.objects.get(id=game['underdog']),
+                    tv=game['tv'],
+                    spread=game['spread'],
+                    date_time=game['date_time'],
+                    is_game_of_week=False,
+                    underdog_score=0,
+                    favorite_score=0,
+                    is_tie_breaker=False
+                )
+                g.save()
 
         super(GameUpload, self).save(*args, **kwargs)
 
@@ -68,12 +82,3 @@ class Bet(models.Model):
             str(self.game_id),
             self.game_id.date_time
         )
-
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    favorite_team = models.OneToOneField(Team, on_delete=models.CASCADE)
-    city = models.CharField(max_length=128)
-
-    def __str__(self):
-        return "{} ({} {})".format(self.user.username, self.user.first_name, self.user.last_name)
