@@ -139,6 +139,8 @@ def home(request):
     ##########################
     
     ### GET SEASON ###
+
+    season = None
     
     try:
         season = Season.objects.get(start__gte=dt, end__lte=dt)
