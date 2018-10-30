@@ -148,7 +148,7 @@ def home(request):
         season     = Season.objects.get(start__lte=dt, end__gte=dt)
     except ObjectDoesNotExist:
         try:
-            season = Season.objects.filter(end__lte=dt).order_by('end').getfirst()
+            season = Season.objects.filter(end__lte=dt).order_by('end').last()
         except ObjectDoesNotExist:
             season = None
 
@@ -187,23 +187,15 @@ def home(request):
                 else:
                     won = False
             if won:
-                print(str(bet))
-                print("\tbet WON")
                 value = value + 1
                 if bet.is_high_risk:
-                    print("\tbet was high risk")
                     value = value + 5
                 if bet.game.is_game_of_week:
-                    print("\tgame is game of week")
                     value = value + 2
             else:
-                print(str(bet))
-                print("\tbet LOST")
                 if bet.is_high_risk:
-                    print("\tbet was high risk")
                     value = value - 5             
         points[bet.user] = value
-    print("Calculating WC change")
     try:
         if season == None:
             raise ObjectDoesNotExist()
@@ -232,20 +224,13 @@ def home(request):
                 else:
                     won = False
             if won:
-                print(str(bet))
-                print("\tbet WON")
                 value = value + 1
                 if bet.is_high_risk:
-                    print("\tbet was high risk")
                     value = value + 5
                 if bet.game.is_game_of_week:
-                    print("\tgame was game of week")
                     value = value + 2
             else:
-                print(str(bet))
-                print("\tbet LOST")
-                if bet.is_high_risk:
-                    print("\tbet was high risk")                    
+                if bet.is_high_risk:                  
                     value = value - 5             
         change[bet.user] = value
 
