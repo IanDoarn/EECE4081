@@ -9,13 +9,18 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from pool.models import Season
 
-def endOfSeasonalWeek(dt):
-    dtnm = stripMicroseconds(dt)
-    season = Season.objects.get(start__lte=dtnm, end__gte=dtnm)
-    i = startOfSeasonalWeek(dt) + timedelta(days=6)
-    if  i > season.end:
-        i = season.end
-    return datetime(i.year, i.month, i.day, 23, 59, 59, 999999, i.tzinfo)
+def endOfSeasonalWeek(dt, season):
+    if  season == None:
+        try:
+            season = Season.objects.get(start__lte=dt, end__gte=dt)
+        except ObjectDoesNotExist:
+            return None
+    if dt.date() > season.end:
+        return None
+    i = startOfSeasonalWeek(dt, season) + timedelta(days=6)
+    if  i.date() > season.end:
+        i = datetime(season.end.year, season.end.month, season.end.day,              tzinfo=i.tzinfo)
+    return  datetime(         i.year,          i.month,          i.day, 23, 59, 59, 999999, i.tzinfo)
 
 def lastWeek(dt):
     return stripTime(dt) - timedelta(days=7)
@@ -28,34 +33,41 @@ def mondayOfSameWeek(dt):
 def nextWeek(dt):
     return stripTime(dt) + timedelta(days=7)
 
-def stripMicroseconds(dt):
-    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, tzinfo=dt.tzinfo)
-
 def stripTime(dt):
     return datetime(dt.year, dt.month, dt.day, tzinfo=dt.tzinfo)
 
-def seasonalWeek(dt):
-    dtnm = stripMicroseconds(dt)
-    season = Season.objects.get(start__lte=dtnm, end__gte=dtnm)
-    i = startOfSeasonalWeek(dt)
+def seasonalWeek(dt, season):
+    if  season == None:
+        try:
+            season = Season.objects.get(start__lte=dt, end__gte=dt)
+        except ObjectDoesNotExist:
+            return None
+    if dt.date() > season.end:
+        return None
+    i = startOfSeasonalWeek(dt, season)
     j = 1
-    while i > season.start:
+    while i.date() > season.start:
         i = i - timedelta(days=7)
         j = j + 1
     return j
 
-def startOfSeasonalWeek(dt):
-    dtmn = stripMicroseconds(dt)
-    season = Season.objects.get(start__lte=dtmn, end__gte=dtmn)
+def startOfSeasonalWeek(dt, season):
+    if  season == None:
+        try:
+            season = Season.objects.get(start__lte=dt, end__gte=dt)
+        except ObjectDoesNotExist:
+            return None
+    if dt.date() > season.end:
+        return None    
     i = stripTime(dt)
     if i.weekday() >= season.start.weekday():
-        i = i - timedelta(days=(i.weekday()-   season.start.weekday() ))
+        i = i - timedelta(days=(i.weekday()-season.start.weekday()))
     else:
         i = i - timedelta(days=i.weekday())
         i = i - timedelta(days=7)
         i = i + timedelta(days=season.start.weekday())
-    if  i < season.start:
-        i = season.start
+    if  i.date() < season.start:
+        i = datetime(season.start.year, season.start.month, season.start.day, tzinfo=i.tzinfo)
     return i
 
 def sundayOfSameWeek(dt):
@@ -71,12 +83,7 @@ def home(request):
     # MISCELLANEOUS #
     #################
     
-    week = None
     dt = timezone.now()
-    try:
-        week = seasonalWeek(dt)
-    except ObjectDoesNotExist:
-        pass
 
     ##################
     # WEEKLY SCORING #
@@ -137,25 +144,36 @@ def home(request):
     # WINSTON CUP SCOREBOARD #
     ##########################
     
-    ### GET SEASON ###
-    
     try:
-        season = Season.objects.get(start__lte=dt, end__gte=dt)
+        season     = Season.objects.get(start__lte=dt, end__gte=dt)
     except ObjectDoesNotExist:
-        season = None
+        try:
+            season = Season.objects.filter(end__lte=dt).order_by('end').getfirst()
+        except ObjectDoesNotExist:
+            season = None
+                 
+    #if season != None:
+    #    if dt.date() < season.end:
+            # In season
+    #        week = seasonalWeek(dt, season)
+    #        if week > 1:
+    #            pass
+                # Ready to take point changes
+            
+    #        if lastWeek(dt).date() > season.start:
+    #            pass
+                # Season is at least one week in
 
-    # Clearly need to work on this.
-
-
-    # OLD CODE BELOW
-
+    if season != None:
+        end = endOfSeasonalWeek(lastWeek(dt), season)
+        if  end == None:
+            end = datetime(season.end.year, season.end.month, season.end.day, tzinfo=dt.tzinfo)
 
     try:
         if season == None:
             raise ObjectDoesNotExist()
         games = Game.objects.filter(date_time__range=(
-            season.start, endOfSeasonalWeek(lastWeek(dt))
-                # todo: replace with start and end of season
+            datetime(season.start.year, season.start.month, season.start.day, tzinfo=dt.tzinfo), end
         ))
     except ObjectDoesNotExist:
         games = []
@@ -189,7 +207,62 @@ def home(request):
             else:
                 if bet.is_high_risk:
                     value = value - 5             
-        points[bet.user] = value  
+        points[bet.user] = value 
+    try:
+        if season == None:
+            raise ObjectDoesNotExist()
+        games = games.filter(date_time__range=(startOfSeasonalWeek(lastWeek(dt), season), end))
+    except ObjectDoesNotExist:
+        games = []
+    try:
+        bets = Bet.objects.filter(game__in=games)
+    except ObjectDoesNotExist:
+        bets = []    
+    change = {}
+    for bet in bets:
+        try:
+            value = change[bet.user]
+        except KeyError:
+            value = 0
+        if bet.game.underdog_score != None and bet.game.favorite_score != None:
+            if bet.team == bet.game.underdog:
+                if bet.game.favorite_score < (bet.game.underdog_score + bet.game.spread):
+                    won = True
+                else:
+                    won = False
+            else:
+                if bet.game.underdog_score < (bet.game.favorite_score - bet.game.spread):
+                    won = True
+                else:
+                    won = False
+            if won:
+                value = value + 1
+                if bet.is_high_risk:
+                    value = value + 5
+                if bet.game.is_game_of_week:
+                    value = value + 2
+            else:
+                if bet.is_high_risk:
+                    value = value - 5             
+        change[bet.user] = value
+
+    # TESTING ONLY
+    print("From WC Points:")        
+    for user in points:
+        print(str(user) + ": " + str(points[user]))
+    
+    print("From WC Change:")
+    for user in change:
+        print(str(user) + ": " + str(change[user]))
+    # TESTING ONLY
+        
+    # todo: figure out how to organize and convey points/change
+    
+    last_week = seasonalWeek(lastWeek(dt), season)
+    this_week = seasonalWeek(         dt , season)
+    
+    print(str(last_week))
+    print(str(this_week))
 
     #################
     # RENDER OUTPUT #
@@ -198,13 +271,11 @@ def home(request):
     return render(
         request, 'home.html',
         {
-            'title': "Winston Cup Week " + str(week) if week != None else "Out of season",
-            'games': Game.objects.filter(date_time__range=(
-                        lastWeek(timezone.now()),
-                        nextWeek(timezone.now())
-                     )).order_by('date_time'),
+            'title': ("Winston Cup Week " + str(this_week)) if this_week != None else "Out of season",
+            'games': Game.objects.filter(date_time__range=(lastWeek(dt), nextWeek(dt))).order_by('date_time'),
             'table_headers': ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time'],
-            'first': first, 'second': second
+            'first': first, 'second': second,
+            'week_header': "Week " + str(last_week) if last_week != None else ""
         }
     )
 

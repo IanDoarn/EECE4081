@@ -92,8 +92,8 @@ class Bet(models.Model):
 
 class Season(models.Model):
     name = models.CharField(max_length=128)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+    start = models.DateField(default=timezone.now)
+    end = models.DateField(default=timezone.now)
 
     def __str__(self):
         return self.name
