@@ -50,9 +50,9 @@
                     {% for game in games %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
-                            <td>{{ game.favorite_id.name }}</td>
+                            <td>{{ game.favorite.name }}</td>
                             <td>{{ game.spread }}</td>
-                            <td>{{ game.underdog_id.name }}</td>
+                            <td>{{ game.underdog.name }}</td>
                             <td>{{ game.tv }}</td>
                             <td>{{ game.date_time }}</td>
                             <td>

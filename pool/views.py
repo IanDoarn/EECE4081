@@ -88,11 +88,8 @@ def home(request):
         ))
     except ObjectDoesNotExist:
         games = []
-    game_ids  = []
-    for game in games:
-        game_ids.append(game.id)            
     try:
-        bets = Bet.objects.filter(game_id__in=game_ids)
+        bets = Bet.objects.filter(game__in=games)
     except ObjectDoesNotExist:
         bets = []
     points = {}
@@ -101,20 +98,20 @@ def home(request):
             value = points[bet.user]
         except KeyError:
             value = 0
-        if bet.game_id.underdog_score != None and bet.game_id.favorite_score != None:
-            if bet.team_id == bet.game_id.underdog_id:
-                if bet.game_id.favorite_score < (bet.game_id.underdog_score + bet.game_id.spread):
+        if bet.game.underdog_score != None and bet.game.favorite_score != None:
+            if bet.team == bet.game.underdog:
+                if bet.game.favorite_score < (bet.game.underdog_score + bet.game.spread):
                     won = True
                 else:
                     won = False
             else:
-                if bet.game_id.underdog_score < (bet.game_id.favorite_score - bet.game_id.spread):
+                if bet.game.underdog_score < (bet.game.favorite_score - bet.game.spread):
                     won = True
                 else:
                     won = False
             if won:
                 value = value + 1
-                if bet.game_id.is_game_of_week:
+                if bet.game.is_game_of_week:
                     value = value + 2             
         points[bet.user] = value
     first  = None
@@ -164,11 +161,8 @@ def home(request):
         ))
     except ObjectDoesNotExist:
         games = []
-    game_ids  = []
-    for game in games:
-        game_ids.append(game.id)
     try:
-        bets = Bet.objects.filter(game_id__in=game_ids)
+        bets = Bet.objects.filter(game__in=games)
     except ObjectDoesNotExist:
         bets = []    
     points = {}
@@ -177,14 +171,14 @@ def home(request):
             value = points[bet.user]
         except KeyError:
             value = 0
-        if bet.game_id.underdog_score != None and bet.game_id.favorite_score != None:
-            if bet.team_id == bet.game_id.underdog_id:
-                if bet.game_id.favorite_score < (bet.game_id.underdog_score + bet.game_id.spread):
+        if bet.game.underdog_score != None and bet.game.favorite_score != None:
+            if bet.team == bet.game.underdog:
+                if bet.game.favorite_score < (bet.game.underdog_score + bet.game.spread):
                     won = True
                 else:
                     won = False
             else:
-                if bet.game_id.underdog_score < (bet.game_id.favorite_score - bet.game_id.spread):
+                if bet.game.underdog_score < (bet.game.favorite_score - bet.game.spread):
                     won = True
                 else:
                     won = False
@@ -192,7 +186,7 @@ def home(request):
                 value = value + 1
                 if bet.is_high_risk:
                     value = value + 5
-                if bet.game_id.is_game_of_week:
+                if bet.game.is_game_of_week:
                     value = value + 2
             else:
                 if bet.is_high_risk:

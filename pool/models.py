@@ -26,9 +26,9 @@ class GameUpload(models.Model):
 
             for game in games['games']:
                 g = Game(
-                    favorite_id=game['favorite'],
-                    underdog_id=game['underdog'],
-                    home_id=game['underdog'],
+                    favorite=game['favorite'],
+                    underdog=game['underdog'],
+                    home=game['underdog'],
                     tv=game['tv'],
                     spread=game['spread'],
                     date_time=game['date_time'],
@@ -59,9 +59,9 @@ class Team(models.Model):
 
 class Game(models.Model):
     id = models.IntegerField(primary_key=True)
-    favorite_id = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='favorite_id')
-    underdog_id = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='underdog_id')
-    home_id = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_id')
+    favorite = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='favorite_id')
+    underdog = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='underdog_id')
+    home = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_id')
     tv = models.CharField(max_length=12)
     date_time = models.DateTimeField()
     spread = models.FloatField()
@@ -76,16 +76,16 @@ class Game(models.Model):
 
 class Bet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
-    team_id = models.ForeignKey(Team, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     is_high_risk = models.BooleanField()
     date_time = models.DateTimeField()
 
     def __str__(self):
         return "{} ({} {})".format(
             self.user.username,
-            str(self.game_id),
-            self.game_id.date_time
+            str(self.game),
+            self.game.date_time
         )
 
 
