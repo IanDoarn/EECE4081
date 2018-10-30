@@ -47,21 +47,18 @@ class GameUpload(models.Model):
 
 
 class Team(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=64)
 
     class Meta:
-        ordering = ["id"]
+        ordering = ["name"]
 
     def __str__(self):
-        return "{} ({})".format(self.name, str(self.id))
-
+        return "{}".format(self.name)
 
 class Game(models.Model):
-    id = models.IntegerField(primary_key=True)
-    favorite = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='favorite_id')
-    underdog = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='underdog_id')
-    home = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_id')
+    favorite = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='favorite')
+    underdog = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='underdog')
+    home = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home')
     tv = models.CharField(max_length=12)
     date_time = models.DateTimeField()
     spread = models.FloatField()
@@ -71,7 +68,10 @@ class Game(models.Model):
     is_tie_breaker = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{} vs {}".format(self.favorite_id.name, self.underdog_id.name)
+        return "{} vs {} on {} at {}".format(
+                self.favorite.name,    self.underdog.name,
+                self.date_time.date(), self.date_time.time()
+            )
 
 
 class Bet(models.Model):
@@ -82,15 +82,14 @@ class Bet(models.Model):
     date_time = models.DateTimeField()
 
     def __str__(self):
-        return "{} ({} {})".format(
+        return "{}'s bet for {} during \"{}\"".format(
             self.user.username,
-            str(self.game),
-            self.game.date_time
+            self.team,
+            self.game
         )
-
+        
 
 class Season(models.Model):
-    id = models.IntegerField(primary_key=True)
     end = models.DateTimeField()
     name = models.CharField(max_length=128)
     start = models.DateTimeField()
