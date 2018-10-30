@@ -3,10 +3,39 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-  <h2>Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-  </form>
+    <div class="container-fluid mx-auto">
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p><strong>Oh snap! </strong>Please enter a correct username and password. Note that both fields are case-sensitive.</p>
+            </div>
+        {% endif %}
+        <div>
+            <div class="center-block" id="login" style="width: 40%;">
+                <form class="form-horizontal form" name="LoginForm"  method="post">
+                    {% csrf_token %}
+                    {% if next %}
+                        <input type="hidden" name="next" value="{{ next }}" />
+                    {% endif %}
+                    <div class="control-group">
+                        <label class="control-label" for="username">Username</label>
+                        <div class="controls">
+                            <input class="form-control" type="text" id="username" name="username"  placeholder="Username">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="password">Password</label>
+                        <div class="controls">
+                            <input class="form-control" type="password" name="password" id="password" placeholder="Password">
+                        </div>
+                  </div><br>
+                  <div class="control-group">
+                    <div class="controls">
+                        <button type="submit" class="btn btn-success">Login</button><a href="{% url 'signup' %}"> or sign up</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        </div>
+    </div>
 {% endblock %}

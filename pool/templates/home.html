@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Home</h1>
-    <h2>Welcome, {{ user.username }}!</h2>
     <style type="text/css">
         .tg {
             border-collapse: collapse;
@@ -36,42 +34,69 @@
             text-align: left
         }
     </style>
-    <div>
-        <table class="tg">
-            <tr>
-                {% for header in table_headers %}
-                    <th class="tg-s268">{{ header }}</th>
-                {% endfor %}
-            </tr>
-            {% for game in games %}
+    <div class="container-fluid pt-3">
+        <div class="mx-auto">
+            <table class="table table-striped">
+            <thead class="thead-dark">
                 <tr>
-                    <td class="tg-s268">{{ game.favorite_id.name }}</td>
-                    <td class="tg-s268">{{ game.spread }}</td>
-                    <td class="tg-s268">{{ game.underdog_id.name }}</td>
-                    <td class="tg-s268">{{ game.tv }}</td>
-                    <td class="tg-s268">{{ game.date_time }}</td>
+                    <th scope="col">#</th>
+                    {% for header in table_headers %}
+                        <th scope="col">{{ header }}</th>
+                    {% endfor %}
                 </tr>
-            {% endfor %}
-        </table>
-    	<br>
-    </div>
-    <div>
-        <table class="tg">
-            {% for game in games %}
-                {% if game.is_game_of_week %}
-                    <tr><th class="tg-s268">Game of the week: {{ game }}</th></tr>
-                {% endif %}
-            {%  endfor %}
-        </table>
-    	<br>
-    </div>
-	<div>
-		<table class="tg">
-			<tr><th class="tg-s268">Previous Weeks Winners</th></tr>
-			<tr><td class="tg-s268">1st - {{ first }}</td></tr>
-			<tr><td class="tg-s268">2nd - {{ second }}</td></tr>
-		</table>
-		<br>
-	</div>
+                </thead>
+                <tbody>
+                    {% for game in games %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ game.favorite_id.name }}</td>
+                            <td>{{ game.spread }}</td>
+                            <td>{{ game.underdog_id.name }}</td>
+                            <td>{{ game.tv }}</td>
+                            <td>{{ game.date_time }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
+        </div>
+        <div>
+            <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Game Of The Week</th>
+                </tr>
+            </thead>
+                <tbody>
+                {% for game in games %}
+                    {% if game.is_game_of_week %}
+                        <tr>
+                            <td>{{ game }}</td>
+                        </tr>
+                    {% endif %}
+                {%  endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <div class="mx-auto">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Previous Weeks Winners</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1st - {{ first }}</td>
+                        </tr>
+                        <tr>
+                            <td>2nd - {{ second }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

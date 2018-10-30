@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Profile</h1>
-    <h2>Welcome, {{ user.username }}!</h2>
 
-    <div class="container">
+    <div class="container-fluid">
         <h1>Username: {{ user }}</h1>
         <p>Email: {{ user.email }}</p>
-
     </div>
 {% endblock %}
