@@ -234,6 +234,14 @@ def home(request):
                     value = value - 5             
         change[bet.user] = value
 
+    if season != None:
+        try:
+            value = points[request.user]
+        except KeyError:
+            points[request.user]     = 0
+            if len(change)          != 0:
+                change[request.user] = 0
+
     # TESTING ONLY
     print("From WC Points:")        
     for user in points:
