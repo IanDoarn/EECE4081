@@ -71,7 +71,7 @@ class Game(models.Model):
 
 class Bet(models.Model):
     id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
     team_id = models.ForeignKey(Team, on_delete=models.CASCADE)
     is_high_risk = models.BooleanField()
