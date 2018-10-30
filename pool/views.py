@@ -6,7 +6,7 @@ from django.contrib import messages
 from .models import Game, Bet
 from datetime import date, datetime, timedelta
 from django.utils import timezone
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from pool.models import Season
 
 def lastWeek(dt):
@@ -30,14 +30,14 @@ def sundayOfSameWeek(dt):
     return datetime(k.year, k.month, k.day, 23, 59, 59, 999999, k.tzinfo)
 
 def endOfSeasonalWeek(dt):
-    season = Season.objects.get(start__gte=dt, end__lte=dt)
+    season = Season.objects.get(start__lte=dt, end__gte=dt)
     i = startOfSeasonalWeek(dt) + timedelta(days=6)
     if  i > season.end:
         i = season.end
     return datetime(i.year, i.month, i.day, 23, 59, 59, 999999, i.tzinfo)
 
 def seasonalWeek(dt):
-    season = Season.objects.get(start__gte=dt, end__lte=dt)
+    season = Season.objects.get(start__lte=dt, end__gte=dt)
     i = startOfSeasonalWeek(dt)
     j = 1
     while i > season.start:
@@ -46,9 +46,11 @@ def seasonalWeek(dt):
     return j
 
 def startOfSeasonalWeek(dt):
-    season = Season.objects.get(start__gte=dt, end__lte=dt)
+    # This function has a bug.
+    season = Season.objects.get(start__lte=dt, end__gte=dt)
     i = stripTime(dt)
-    i = i - timedelta(days=7-season.start.weekday()) - timedelta(days=i.weekday())
+    #print(str(i.weekday()) + ", " + str(0))  #str(7 - season.start.weekday()))
+    i = i - timedelta(days=i.weekday()) # - timedelta(days=7-season.start.weekday())
     if  i < season.start:
         i = season.start
     return i
@@ -58,12 +60,112 @@ def home(request):
 
     # TESTING ONLY    
     try:
-        dt = timezone.now()
-        while True:
-            print(str(dt) + ", " + str(startOfSeasonalWeek(dt)) + ", " + str(endOfSeasonalWeek(dt)) + ", " + str(seasonalWeek(dt)))
+        dt = timezone.now() - timedelta(days=67)
+        bug_count = 0
+        ok        = 0
+        while ok < 25:
+            
+            old_bug_count = bug_count
+            
+            print(dt.strftime("%c") + ":")
+            
+            if (bug_count > 20):
+                season = Season.objects.get(start__lte=dt, end__gte=dt)
+            
+            bugs = []
+
+            try:
+                wnr = seasonalWeek(dt)
+            except ObjectDoesNotExist:
+                bugs.append("could not get WNR")
+                wnr = None
+            
+            try:
+                sow = startOfSeasonalWeek(dt)
+                try:
+                    sow_eow = endOfSeasonalWeek(sow)
+                except ObjectDoesNotExist:
+                    bugs.append("could not get SOW_EOW")
+                    sow_eow = None
+                try:
+                    sow_sow = startOfSeasonalWeek(sow)
+                except ObjectDoesNotExist:
+                    bugs.append("could not get SOW_SOW")
+                    sow_sow = None
+                try:
+                    sow_wnr = seasonalWeek(sow)
+                except ObjectDoesNotExist:
+                    bugs.append("could not get SOW_WNR")
+                    sow_wnr = None
+            except ObjectDoesNotExist:
+                bugs.append("could not get SOW")
+                sow     = None
+                sow_eow = None
+                sow_sow = None
+                sow_wnr = None
+
+            try:
+                eow = endOfSeasonalWeek(dt)
+                try:
+                    eow_eow = endOfSeasonalWeek(eow)
+                except ObjectDoesNotExist:
+                    bugs.append("could not get EOW_EOW")
+                    eow_eow = None
+                try:
+                    eow_sow = startOfSeasonalWeek(eow)
+                except ObjectDoesNotExist:
+                    bugs.append("could not get EOW_SOW")
+                    eow_sow = None
+                try:
+                    eow_wnr = seasonalWeek(eow)
+                except ObjectDoesNotExist:
+                    bugs.append("could not get EOW_WNR")
+                    eow_wnr = None
+            except ObjectDoesNotExist:
+                bugs.append("could not get EOW")
+                eow     = None
+                eow_eow = None
+                eow_sow = None
+                eow_wnr = None
+
+            if sow != sow_sow or sow != eow_sow:
+                bugs.append("starts of week do not match")
+                bugs.append("\t    SOW: " + (str(    sow) if     sow == None else     sow.strftime("%c")))
+                bugs.append("\tSOW_SOW: " + (str(sow_sow) if sow_sow == None else sow_sow.strftime("%c")))
+                bugs.append("\tEOW_SOW: " + (str(eow_sow) if eow_sow == None else eow_sow.strftime("%c")))
+                
+            if eow != sow_eow or eow != eow_eow:
+                bugs.append("ends of week do not match")
+                bugs.append("\t    EOW: " + (str(    eow) if     eow == None else     eow.strftime("%c")))
+                bugs.append("\tSOW_EOW: " + (str(sow_eow) if sow_eow == None else sow_eow.strftime("%c")))
+                bugs.append("\tEOW_EOW: " + (str(eow_eow) if eow_eow == None else eow_eow.strftime("%c")))                
+
+            if sow_wnr != eow_wnr or sow_wnr != wnr or eow_wnr != wnr:
+                bugs.append("week numbers do not match")
+                bugs.append("\t    WNR: " + str(    wnr))
+                bugs.append("\tSOW_WNR: " + str(sow_wnr))
+                bugs.append("\tEOW_WNR: " + str(eow_wnr))
+                
+            for bug in bugs:
+                print("\tBUG: " + bug)
+                bug_count += 1
+            
+            print("\tWNR: " +  str(wnr)                                        )
+            print("\tSOW: " + (str(sow) if sow == None else sow.strftime("%c")))
+            print("\tEOW: " + (str(eow) if eow == None else eow.strftime("%c")))
+            
+            if bug_count > 100:
+                raise AssertionError
+            
             dt = dt + timedelta(days=1)
+            
+            if old_bug_count == bug_count:
+                ok += 1
+    except AssertionError:
+        print("\tToo many bugs to continue")
     except ObjectDoesNotExist:
-        pass
+        print("\tCould not get season")
+    print("END OF STREAM")
     # END OF TESTING ONLY
 
     #################
@@ -130,10 +232,7 @@ def home(request):
                         second = user
                 else:
                     if points[user] >= points[second]:
-                        second = user  
-                        
-    print(str(first))
-    print(str(second))
+                        second = user
                         
     ##########################
     # WINSTON CUP SCOREBOARD #
@@ -142,7 +241,7 @@ def home(request):
     ### GET SEASON ###
     
     try:
-        season = Season.objects.get(start__gte=dt, end__lte=dt)
+        season = Season.objects.get(start__lte=dt, end__gte=dt)
     except ObjectDoesNotExist:
         season = None
 
@@ -206,8 +305,7 @@ def home(request):
                         nextWeek(timezone.now())
                      )).order_by('date_time'),
             'table_headers': ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time'],
-             'first': first, #,
-            'second': second# None if second == None else second.name
+            'first': first, 'second': second
         }
     )
 

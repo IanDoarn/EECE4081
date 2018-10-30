@@ -54,6 +54,7 @@ class Team(models.Model):
 
     def __str__(self):
         return "{}".format(self.name)
+    
 
 class Game(models.Model):
     favorite = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='favorite')
@@ -90,9 +91,9 @@ class Bet(models.Model):
         
 
 class Season(models.Model):
-    end = models.DateTimeField()
     name = models.CharField(max_length=128)
     start = models.DateTimeField()
+    end = models.DateTimeField()
 
     def __str__(self):
         return self.name
