@@ -69,6 +69,7 @@ def home(request):
     #################
     # MISCELLANEOUS #
     #################
+    
     week = None
     dt = timezone.now()
     try:
@@ -97,7 +98,7 @@ def home(request):
     points = {}
     for bet in bets:
         try:
-            value = points[bet.user_id]
+            value = points[bet.user]
         except KeyError:
             value = 0
         if bet.game_id.underdog_score != None and bet.game_id.favorite_score != None:
@@ -115,7 +116,7 @@ def home(request):
                 value = value + 1
                 if bet.game_id.is_game_of_week:
                     value = value + 2             
-        points[bet.user_id] = value
+        points[bet.user] = value
     first  = None
     second = None    
     for user in points:
@@ -134,18 +135,19 @@ def home(request):
                     if points[user] >= points[second]:
                         second = user  
                         
+    print(str(first))
+    print(str(second))
+                        
     ##########################
     # WINSTON CUP SCOREBOARD #
     ##########################
     
     ### GET SEASON ###
-
-    season = Season()
     
     try:
         season = Season.objects.get(start__gte=dt, end__lte=dt)
     except ObjectDoesNotExist:
-        pass
+        season = None
 
     # Clearly need to work on this.
 
@@ -154,6 +156,8 @@ def home(request):
 
 
     try:
+        if season == None:
+            raise ObjectDoesNotExist()
         games = Game.objects.filter(date_time__range=(
             season.start, endOfSeasonalWeek(lastWeek(dt))
                 # todo: replace with start and end of season
@@ -170,7 +174,7 @@ def home(request):
     points = {}
     for bet in bets:
         try:
-            value = points[bet.user_id]
+            value = points[bet.user]
         except KeyError:
             value = 0
         if bet.game_id.underdog_score != None and bet.game_id.favorite_score != None:
@@ -193,7 +197,7 @@ def home(request):
             else:
                 if bet.is_high_risk:
                     value = value - 5             
-        points[bet.user_id] = value  
+        points[bet.user] = value  
 
     #################
     # RENDER OUTPUT #
@@ -208,7 +212,8 @@ def home(request):
                         nextWeek(timezone.now())
                      )).order_by('date_time'),
             'table_headers': ['Favorite', 'Line', 'Underdog', 'TV', 'Date / Time'],
-            'first': first, 'second': second
+             'first': first, #,
+            'second': second# None if second == None else second.name
         }
     )
 
