@@ -9,6 +9,14 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from pool.models import Season
 
+def endOfSeasonalWeek(dt):
+    dtnm = stripMicroseconds(dt)
+    season = Season.objects.get(start__lte=dtnm, end__gte=dtnm)
+    i = startOfSeasonalWeek(dt) + timedelta(days=6)
+    if  i > season.end:
+        i = season.end
+    return datetime(i.year, i.month, i.day, 23, 59, 59, 999999, i.tzinfo)
+
 def lastWeek(dt):
     return stripTime(dt) - timedelta(days=7)
 
@@ -20,24 +28,15 @@ def mondayOfSameWeek(dt):
 def nextWeek(dt):
     return stripTime(dt) + timedelta(days=7)
 
+def stripMicroseconds(dt):
+    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, tzinfo=dt.tzinfo)
+
 def stripTime(dt):
     return datetime(dt.year, dt.month, dt.day, tzinfo=dt.tzinfo)
 
-def sundayOfSameWeek(dt):
-    i =    stripTime(dt)
-    j =  6 - i.weekday()
-    k =  i + timedelta(days=j)
-    return datetime(k.year, k.month, k.day, 23, 59, 59, 999999, k.tzinfo)
-
-def endOfSeasonalWeek(dt):
-    season = Season.objects.get(start__lte=dt, end__gte=dt)
-    i = startOfSeasonalWeek(dt) + timedelta(days=6)
-    if  i > season.end:
-        i = season.end
-    return datetime(i.year, i.month, i.day, 23, 59, 59, 999999, i.tzinfo)
-
 def seasonalWeek(dt):
-    season = Season.objects.get(start__lte=dt, end__gte=dt)
+    dtnm = stripMicroseconds(dt)
+    season = Season.objects.get(start__lte=dtnm, end__gte=dtnm)
     i = startOfSeasonalWeek(dt)
     j = 1
     while i > season.start:
@@ -46,14 +45,24 @@ def seasonalWeek(dt):
     return j
 
 def startOfSeasonalWeek(dt):
-    # This function has a bug.
-    season = Season.objects.get(start__lte=dt, end__gte=dt)
+    dtmn = stripMicroseconds(dt)
+    season = Season.objects.get(start__lte=dtmn, end__gte=dtmn)
     i = stripTime(dt)
-    #print(str(i.weekday()) + ", " + str(0))  #str(7 - season.start.weekday()))
-    i = i - timedelta(days=i.weekday()) # - timedelta(days=7-season.start.weekday())
+    if i.weekday() >= season.start.weekday():
+        i = i - timedelta(days=(i.weekday()-   season.start.weekday() ))
+    else:
+        i = i - timedelta(days=i.weekday())
+        i = i - timedelta(days=7)
+        i = i + timedelta(days=season.start.weekday())
     if  i < season.start:
         i = season.start
     return i
+
+def sundayOfSameWeek(dt):
+    i =    stripTime(dt)
+    j =  6 - i.weekday()
+    k =  i + timedelta(days=j)
+    return datetime(k.year, k.month, k.day, 23, 59, 59, 999999, k.tzinfo)
 
 @login_required
 def home(request):
@@ -63,7 +72,7 @@ def home(request):
         dt = timezone.now() - timedelta(days=67)
         bug_count = 0
         ok        = 0
-        while ok < 25:
+        while ok < 1000:
             
             old_bug_count = bug_count
             
@@ -83,11 +92,13 @@ def home(request):
             try:
                 sow = startOfSeasonalWeek(dt)
                 try:
+                    print("sow_eow")
                     sow_eow = endOfSeasonalWeek(sow)
                 except ObjectDoesNotExist:
                     bugs.append("could not get SOW_EOW")
                     sow_eow = None
                 try:
+                    print("sow_sow")
                     sow_sow = startOfSeasonalWeek(sow)
                 except ObjectDoesNotExist:
                     bugs.append("could not get SOW_SOW")
@@ -107,11 +118,13 @@ def home(request):
             try:
                 eow = endOfSeasonalWeek(dt)
                 try:
+                    print("eow_eow")
                     eow_eow = endOfSeasonalWeek(eow)
                 except ObjectDoesNotExist:
                     bugs.append("could not get EOW_EOW")
                     eow_eow = None
                 try:
+                    print("eow_sow")
                     eow_sow = startOfSeasonalWeek(eow)
                 except ObjectDoesNotExist:
                     bugs.append("could not get EOW_SOW")
