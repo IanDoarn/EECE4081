@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
-from .utils.excel_reader import get_games_from_template
+from .utils.excel_reader import ExcelParser
 
 class GameUpload(models.Model):
     title = models.CharField(max_length=128, default="Unknown")
@@ -14,25 +14,30 @@ class GameUpload(models.Model):
 
     def save(self, *args, **kwargs):
         if self.file:
-            games = get_games_from_template(self.file.path, Team.objects.all())
+            ep = ExcelParser(self.file.path, Team.objects.all(), Game.objects.all())
 
-            _id = max([g.id for g in Game.objects.all()])
+            # TODO: find a way to specify which games to update based on if we are
+            # TODO: Adding new games to the table or updating old ones with scores
+
+            # NOTE: This only works for uploading new games but DOES NOT CHECK if
+            # NOTE: if those games are are already in the table
+
+            games = ep.parse()
 
             for game in games['games']:
-                _id += 1
                 g = Game(
-                    id=_id,
-                    favorite_id=Team.objects.get(id=game['favorite']),
-                    underdog_id=Team.objects.get(id=game['underdog']),
-                    home_id=Team.objects.get(id=game['underdog']),
+                    favorite_id=game['favorite'],
+                    underdog_id=game['underdog'],
+                    home_id=game['underdog'],
                     tv=game['tv'],
                     spread=game['spread'],
                     date_time=game['date_time'],
                     is_game_of_week=False,
-                    underdog_score=0,
-                    favorite_score=0,
+                    underdog_score=None,
+                    favorite_score=None,
                     is_tie_breaker=False
                 )
+
                 g.save()
 
         super(GameUpload, self).save(*args, **kwargs)

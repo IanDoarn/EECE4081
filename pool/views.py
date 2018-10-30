@@ -69,7 +69,7 @@ def home(request):
     #################
     # MISCELLANEOUS #
     #################
-    
+    week = None
     dt = timezone.now()
     try:
         week = seasonalWeek(dt)
@@ -140,7 +140,7 @@ def home(request):
     
     ### GET SEASON ###
 
-    season = None
+    season = Season()
     
     try:
         season = Season.objects.get(start__gte=dt, end__lte=dt)
