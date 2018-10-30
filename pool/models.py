@@ -1,12 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
+from django.utils import timezone
 from .utils.excel_reader import get_games_from_template
 
 class GameUpload(models.Model):
-    title = models.CharField(max_length=128)
-    upload_date = models.DateTimeField()
-    file = models.FileField(validators=[FileExtensionValidator(['xlsx'])])
+    title = models.CharField(max_length=128, default="Unknown")
+    upload_date = models.DateTimeField(default=timezone.now())
+    file = models.FileField(default=None, validators=[FileExtensionValidator(['xlsx'])])
 
     class Meta:
         ordering = ["upload_date"]
@@ -70,7 +71,7 @@ class Game(models.Model):
 
 class Bet(models.Model):
     id = models.IntegerField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
     team_id = models.ForeignKey(Team, on_delete=models.CASCADE)
     is_high_risk = models.BooleanField()
@@ -78,7 +79,7 @@ class Bet(models.Model):
 
     def __str__(self):
         return "{} ({} {})".format(
-            self.user_id.username,
+            self.user.username,
             str(self.game_id),
             self.game_id.date_time
         )
