@@ -1,41 +1,52 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <style type="text/css">
-        .tg {
-            border-collapse: collapse;
-            border-spacing: 0;
-        }
 
-        .tg td {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            padding: 10px 5px;
-            border-style: solid;
-            border-width: 1px;
-            overflow: hidden;
-            word-break: normal;
-            border-color: black;
-        }
+    <div class="container pt-3 panel">
+        <div class="container-fluid">
 
-        .tg th {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            font-weight: normal;
-            padding: 10px 5px;
-            border-style: solid;
-            border-width: 1px;
-            overflow: hidden;
-            word-break: normal;
-            border-color: black;
-        }
+            <div class="">
+            <table class="table table-sm">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Game Of The Week</th>
+                </tr>
+            </thead>
+                <tbody>
+                {% for game in games %}
+                    {% if game.is_game_of_week %}
+                        <tr>
+                            <td>{{ game }}</td>
+                        </tr>
+                    {% endif %}
+                {%  endfor %}
+                </tbody>
+            </table>
+            </div>
 
-        .tg .tg-s268 {
-            text-align: left
-        }
-    </style>
-    <div class="container-fluid pt-3">
-        <div class="mx-auto">
+            <div class="">
+            <table class="table table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Previous Weeks Winners</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1st - {{ first }}</td>
+                    </tr>
+                    <tr>
+                        <td>2nd - {{ second }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container-fluid text-center">
+        <div >
             <table class="table table-striped">
             <thead class="thead-dark">
                 <tr>
@@ -64,45 +75,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-
-        </div>
-        <div>
-            <table class="table">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Game Of The Week</th>
-                </tr>
-            </thead>
-                <tbody>
-                {% for game in games %}
-                    {% if game.is_game_of_week %}
-                        <tr>
-                            <td>{{ game }}</td>
-                        </tr>
-                    {% endif %}
-                {%  endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div>
-            <div class="mx-auto">
-                <table class="table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">Previous Weeks Winners</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1st - {{ first }}</td>
-                        </tr>
-                        <tr>
-                            <td>2nd - {{ second }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 {% endblock %}
