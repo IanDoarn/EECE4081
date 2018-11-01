@@ -1,2 +1,2 @@
-cryptography
+django-tables2
 xlrd

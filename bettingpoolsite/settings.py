@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pool.apps.PoolConfig'
+    'pool.apps.PoolConfig',
+    'django_tables2'
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home'
+DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'

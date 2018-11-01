@@ -8,6 +8,8 @@ from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from pool.models import Season
+from django_tables2 import RequestConfig
+from .tables import GameTable
 
 def endOfSeasonalWeek(dt, season):
     if  season == None:
@@ -263,6 +265,7 @@ def home(request):
     #################
     # RENDER OUTPUT #
     #################
+
     
     return render(
         request, 'home.html',
@@ -283,6 +286,10 @@ def profile(request):
 
     return render(request, 'accounts/profile.html')
 
+def games(request):
+    table = GameTable(Game.objects.all())
+    RequestConfig(request).configure(table)
+    return render(request, 'games.html', {'table': table})
 
 def signup(request):
     if request.method == 'POST':
