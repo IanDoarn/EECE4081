@@ -333,7 +333,9 @@ def betpage(request):
                 elif dict(request.POST)['underdog'][0] == 'on':
                     t = _game.underdog
             except Exception:
-                t = choice(_game.favorite, _game.underdog)
+                print(_game.favorite)
+                print(_game.underdog)
+                t = _game.favorite
 
             hr = False
 

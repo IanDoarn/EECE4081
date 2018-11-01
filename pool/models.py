@@ -68,6 +68,11 @@ class Game(models.Model):
     favorite_score = models.IntegerField(null=True, blank=True)
     is_tie_breaker = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = [
+            'date_time'
+        ]
+
     def __str__(self):
         return "{} vs {} on {} at {}".format(
                 self.favorite.name,    self.underdog.name,
@@ -83,6 +88,12 @@ class Bet(models.Model):
     date_time = models.DateTimeField()
     has_paid_for_season = models.BooleanField(default=False)
     has_paid_for_week = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = [
+            'date_time',
+            'user'
+        ]
 
     def __str__(self):
         return "{}'s bet for {} during \"{}\"".format(
