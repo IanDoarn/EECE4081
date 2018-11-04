@@ -81,6 +81,8 @@ class Bet(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     is_high_risk = models.BooleanField()
     date_time = models.DateTimeField()
+    has_paid_for_season = models.BooleanField(default=False)
+    has_paid_for_week = models.BooleanField(default=False)
 
     def __str__(self):
         return "{}'s bet for {} during \"{}\"".format(
@@ -97,3 +99,15 @@ class Season(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Subscription(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    start = models.DateField(default=timezone.now)
+
+
+class SeasonalSubscription(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    season = models.OneToOneField(Season, on_delete=models.CASCADE)
+
+
