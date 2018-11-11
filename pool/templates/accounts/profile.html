@@ -6,4 +6,37 @@
         <h1>Username: {{ user }}</h1>
         <p>Email: {{ user.email }}</p>
     </div>
+    
+    <div class="container-fluid text-center">
+        <div >
+            <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    {% for header in table_headers %}
+                        <th scope="col">{{ header }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                    {% for bet in bets %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ game.favorite.name }}</td>
+                            <td>{{ game.spread }}</td>
+                            <td>{{ game.underdog.name }}</td>
+                            <td>{{ game.tv }}</td>
+                            <td>{{ game.date_time }}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false">
+                                  Place Bet
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>    
+    
 {% endblock %}
