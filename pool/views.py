@@ -284,7 +284,12 @@ def profile(request):
     # TODO: Watch video and implement functionality to retrieve bets from Bet table
     # https://www.youtube.com/watch?v=VxOsCKMStuw&index=48&list=PLw02n0FEB3E3VSHjyYMcFadtQORvl1Ssj
 
-    return render(request, 'accounts/profile.html')
+    return render(
+        request, 'accounts/profile.html',
+        {
+            'bets': Bet.objects.filter(user=request.user).order_by('date_time')
+        }
+    )
 
 def games(request):
     table = GameTable(Game.objects.all())

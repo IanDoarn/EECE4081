@@ -22,21 +22,21 @@
                     {% for bet in bets %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
-                            <td>{{ game.favorite.name }}</td>
-                            <td>{{ game.spread }}</td>
-                            <td>{{ game.underdog.name }}</td>
-                            <td>{{ game.tv }}</td>
-                            <td>{{ game.date_time }}</td>
-                            <td>
-                                <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false">
-                                  Place Bet
-                                </button>
-                            </td>
-                        </tr>
+                            <td>{{ bet.game }}</td>
+                            <td>{{ bet.team }}</td>
+                            <td>{{ bet.is_high_risk }}</td>
+                            <td>{{ bet.date_time }}</td>
+                            <td>{{ bet.has_paid_for_season }}</td>
+                            <td>{{ bet.has_paid_for_week }}</td>
+                            <td>{{ bet.game.spread }}</td>
+                            <td>{{ bet.game.underdog_score }}</td>
+                            <td>{{ bet.game.favorite_score }}</td>
+                            
+                    	</tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>    
-    
+    </div>   
+     
 {% endblock %}
