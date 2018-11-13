@@ -5,7 +5,11 @@
 
     <div class="container-fluid">
         <div class="container-fluid">
+        	<form action="" method="post">
+            {% csrf_token %}
             {% render_table table %}
+        	<input type="submit"/>
+        	</form>
         </div>
     </div>
 {% endblock %}

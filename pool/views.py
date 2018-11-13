@@ -294,6 +294,10 @@ def profile(request):
 def games(request):
     table = GameTable(Game.objects.all())
     RequestConfig(request).configure(table)
+
+    if request.POST:
+        print(request.POST)
+
     return render(request, 'games.html', {'table': table})
 
 def signup(request):
