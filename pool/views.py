@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from .models import Game, Bet
 from datetime import date, datetime, timedelta
 from django.utils import timezone
@@ -10,6 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from pool.models import Season
 from django_tables2 import RequestConfig
 from .tables import GameTable
+from .forms import BetForm
+
 
 def endOfSeasonalWeek(dt, season):
     if  season == None:
@@ -281,9 +282,6 @@ def home(request):
 
 @login_required
 def profile(request):
-    # TODO: Watch video and implement functionality to retrieve bets from Bet table
-    # https://www.youtube.com/watch?v=VxOsCKMStuw&index=48&list=PLw02n0FEB3E3VSHjyYMcFadtQORvl1Ssj
-
     return render(
         request, 'accounts/profile.html',
         {
@@ -296,9 +294,21 @@ def games(request):
     RequestConfig(request).configure(table)
 
     if request.POST:
-        print(request.POST)
+        # this is a terrible fucking way to do this but we literally
+        # do not have time to figure the right way out
+        request.session['current_bet_id'] = list(dict(request.POST))[1]
+        return redirect('betpage')
 
     return render(request, 'games.html', {'table': table})
+
+@login_required
+def betpage(request):
+    form = BetForm()
+    if request.POST:
+        print(request.POST.get('amount'))
+        return redirect('games')
+
+    return render(request, 'betpage.html', {'form': form, 'bet_id': request.session['current_bet_id']})
 
 def signup(request):
     if request.method == 'POST':
