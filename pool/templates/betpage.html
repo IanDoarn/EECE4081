@@ -1,16 +1,28 @@
 {% extends 'base.html' %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
-    <div>
-        <nav class="navbar navbar-light bg-light">
-          <a class="navbar-brand" href="#">
-              {{ game }}
-          </a>
-        </nav>
+    <div class="card" style="width: 18rem;">
+        <div class="card-header">
+            {{ game }}
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+              {% csrf_token %}
+              <div class="row">
+                  <div>
+                      {{ form.favorite|as_crispy_field }}
+                  </div>
+                  <div>
+                      {{ form.underdog|as_crispy_field }}
+                  </div>
+                  <div>
+                      {{ form.high_risk|as_crispy_field }}
+                  </div>
+              </div>
+              <button type="submit" class="btn btn-success">Submit Bet Now!</button>
+            </form>
+        </div>
     </div>
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {{ form }}
-      <button type="submit" class="btn btn-success">Submit Bet Now!</button>
-    </form>
 {% endblock %}

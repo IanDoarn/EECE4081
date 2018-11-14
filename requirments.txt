@@ -1,2 +1,3 @@
 django-tables2
 xlrd
+django-crispy-forms

@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pool.apps.PoolConfig',
-    'django_tables2'
+    'django_tables2',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,4 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home'
 DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
