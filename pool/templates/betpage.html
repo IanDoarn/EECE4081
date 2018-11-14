@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {{ bet_id }}
+    <div>
+        <nav class="navbar navbar-light bg-light">
+          <a class="navbar-brand" href="#">
+              {{ game }}
+          </a>
+        </nav>
+    </div>
     <form method="post" novalidate>
       {% csrf_token %}
       {{ form }}
-      <button type="submit">Submit</button>
+      <button type="submit" class="btn btn-success">Submit Bet Now!</button>
     </form>
 {% endblock %}

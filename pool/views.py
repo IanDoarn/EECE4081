@@ -10,6 +10,7 @@ from pool.models import Season
 from django_tables2 import RequestConfig
 from .tables import GameTable
 from .forms import BetForm
+from django.contrib import messages
 
 
 def endOfSeasonalWeek(dt, season):
@@ -308,7 +309,7 @@ def betpage(request):
         print(request.POST.get('amount'))
         return redirect('games')
 
-    return render(request, 'betpage.html', {'form': form, 'bet_id': request.session['current_bet_id']})
+    return render(request, 'betpage.html', {'form': form, 'game': Game.objects.filter(id=request.session['current_bet_id'].split('_')[2]).first()})
 
 def signup(request):
     if request.method == 'POST':
