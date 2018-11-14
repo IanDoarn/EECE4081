@@ -3,6 +3,26 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <p><strong>Oh snap! </strong>{{ form.errors }}</p>
+    </div>
+    {% endif %}
+    {% if subscription is None %}
+    <div class="alert alert-danger">
+        <p><strong>Oh snap! </strong>You don't seem to have a subscription for this week!</p>
+        <p>Please subscribe to this weeks betting pool or subscribe to this season!</p>
+    </div>
+    <div>
+        <nav class="navbar navbar-light bg-light">
+          <form class="form-inline">
+            <a type="button" class="btn btn-primary" href="{% url 'home' %}" style="color: #ffff">Go Back!</a
+            <a class="col-1"></a>
+            <a type="button" class="btn btn-primary" href="#" style="color: #ffff">Subscribe Now!</a>
+          </form>
+        </nav>
+    </div>
+    {% endif %}
     <div class="card" style="width: 18rem;">
         <div class="card-header">
             {{ game }}
@@ -11,17 +31,25 @@
             <form method="post" novalidate>
               {% csrf_token %}
               <div class="row">
-                  <div>
+                  <div class="col-2">
                       {{ form.favorite|as_crispy_field }}
                   </div>
-                  <div>
+              </div>
+              <div class="row">
+                  <div class="col-2">
                       {{ form.underdog|as_crispy_field }}
                   </div>
-                  <div>
+              </div>
+              <div class="row">
+                  <div class="col-2">
                       {{ form.high_risk|as_crispy_field }}
                   </div>
               </div>
-              <button type="submit" class="btn btn-success">Submit Bet Now!</button>
+             {% if subscription is None %}
+             <button type="submit" disabled class="btn btn-success">Submit Bet Now!</button>
+             {% else %}
+             <button type="submit" class="btn btn-success">Submit Bet Now!</button>
+             {% endif %}
             </form>
         </div>
     </div>

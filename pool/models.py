@@ -105,9 +105,15 @@ class Subscription(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     start = models.DateField(default=timezone.now)
 
+    def __str__(self):
+        return "{} {}".format(self.user.username, self.start)
+
 
 class SeasonalSubscription(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     season = models.OneToOneField(Season, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{} {}".format(self.user.username, self.season)
 
 

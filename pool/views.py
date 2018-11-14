@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from .models import Game, Bet
 from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from pool.models import Season
+from pool.models import Season, Subscription, SeasonalSubscription
 from django_tables2 import RequestConfig
 from .tables import GameTable
 from .forms import BetForm
@@ -246,6 +247,7 @@ def home(request):
             if len(change)          != 0:
                 change[request.user] = 0
 
+
     # TESTING ONLY
     print("From WC Points:")        
     for user in points:
@@ -304,12 +306,33 @@ def games(request):
 
 @login_required
 def betpage(request):
-    form = BetForm()
-    if request.POST:
-        print(request.POST.get('amount'))
-        return redirect('games')
+    # Set session tokens to determine if use has a subscription
+    # and / or user has registered for the current season
 
-    return render(request, 'betpage.html', {'form': form, 'game': Game.objects.filter(id=request.session['current_bet_id'].split('_')[2]).first()})
+    subscription = Subscription.objects.filter(user=request.user).first()
+    season_subscription = SeasonalSubscription.objects.filter(user=request.user).first()
+
+    betform = BetForm()
+
+    print(subscription)
+    print(season_subscription)
+
+    if request.POST:
+        betform = BetForm(request.POST)
+        if betform.is_valid():
+            del request.session['current_bet_id']
+            return redirect('games')
+        else:
+            del request.session['current_bet_id']
+            pass
+
+    return render(request, 'betpage.html',
+                  {'form': betform,
+                   'game': Game.objects.filter(id=request.session['current_bet_id'].split('_')[2]).first(),
+                   'subscription': subscription,
+                   'seasonal_subscription': season_subscription
+                   }
+                  )
 
 def signup(request):
     if request.method == 'POST':
