@@ -23,6 +23,19 @@
         </nav>
     </div>
     {% endif %}
+    {% if existing_bet is not None %}
+    <div class="alert alert-danger">
+        <p><strong>Oh snap! </strong>You seem to have already bet on this game!</p>
+    </div>
+    <div>
+        <nav class="navbar navbar-light bg-light">
+          <form class="form-inline">
+            <a type="button" class="btn btn-primary" href="{% url 'home' %}" style="color: #ffff">Go Back!</a>
+          </form>
+        </nav>
+    </div>
+    {% endif %}
+
     <div class="card" style="width: 18rem;">
         <div class="card-header">
             {{ game }}
@@ -46,6 +59,8 @@
                   </div>
               </div>
              {% if subscription is None %}
+             <button type="submit" disabled class="btn btn-success">Submit Bet Now!</button>
+             {% elif existing_bet is not None %}
              <button type="submit" disabled class="btn btn-success">Submit Bet Now!</button>
              {% else %}
              <button type="submit" class="btn btn-success">Submit Bet Now!</button>

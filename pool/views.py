@@ -12,6 +12,7 @@ from django_tables2 import RequestConfig
 from .tables import GameTable
 from .forms import BetForm
 from django.contrib import messages
+from random import choice
 
 
 def endOfSeasonalWeek(dt, season):
@@ -309,28 +310,64 @@ def betpage(request):
     # Set session tokens to determine if use has a subscription
     # and / or user has registered for the current season
 
+    _game = Game.objects.filter(id=request.session['current_bet_id'].split('_')[2]).first()
     subscription = Subscription.objects.filter(user=request.user).first()
     season_subscription = SeasonalSubscription.objects.filter(user=request.user).first()
+    existing_bet = Bet.objects.filter(user=request.user, game=_game).first()
 
     betform = BetForm()
 
-    print(subscription)
-    print(season_subscription)
+    print(existing_bet)
 
     if request.POST:
         betform = BetForm(request.POST)
         if betform.is_valid():
+
+            print(dict(request.POST))
+
+            t = None
+            try:
+                if dict(request.POST)['favorite'][0] == 'on':
+                    t = _game.favorite
+                elif dict(request.POST)['underdog'][0] == 'on':
+                    t = _game.underdog
+            except Exception:
+                t = choice(_game.favorite, _game.underdog)
+
+            hr = False
+
+            try:
+                if dict(request.POST)['high_risk'][0] == 'on':
+                    hr = True
+            except Exception:
+                pass
+
+
+
+            b = Bet(
+                user=request.user,
+                game=_game,
+                team=t,
+                is_high_risk=hr,
+                date_time=timezone.now(),
+                has_paid_for_week=True if subscription is not None else False,
+                has_paid_for_season=True if season_subscription is not None else False
+            )
+
+            b.save()
+
             del request.session['current_bet_id']
             return redirect('games')
         else:
-            del request.session['current_bet_id']
+            # del request.session['current_bet_id']
             pass
 
     return render(request, 'betpage.html',
                   {'form': betform,
-                   'game': Game.objects.filter(id=request.session['current_bet_id'].split('_')[2]).first(),
+                   'game': _game,
                    'subscription': subscription,
-                   'seasonal_subscription': season_subscription
+                   'seasonal_subscription': season_subscription,
+                   'existing_bet': existing_bet
                    }
                   )
 
