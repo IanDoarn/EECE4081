@@ -294,7 +294,8 @@ def profile(request):
     )
 
 def games(request):
-    table = GameTable(Game.objects.all())
+    dt = timezone.now()
+    table = GameTable(Game.objects.filter(date_time__range=(lastWeek(dt), nextWeek(dt))).order_by('date_time'))
     RequestConfig(request).configure(table)
 
     if request.POST:
@@ -367,7 +368,8 @@ def betpage(request):
                    'game': _game,
                    'subscription': subscription,
                    'seasonal_subscription': season_subscription,
-                   'existing_bet': existing_bet
+                   'existing_bet': existing_bet,
+                   'current_date': timezone.now()
                    }
                   )
 
