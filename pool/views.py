@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+# from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from .models import Game, Bet
 from datetime import date, datetime, timedelta
@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from pool.models import Season, Subscription, SeasonalSubscription
 from django_tables2 import RequestConfig
 from .tables import GameTable
-from .forms import BetForm
+from .forms import BetForm, UserCreationForm
 from django.contrib import messages
 from random import choice
 
@@ -356,7 +356,7 @@ def betpage(request):
 
             b.save()
 
-            del request.session['current_bet_id']
+            # del request.session['current_bet_id']
             return redirect('games')
         else:
             # del request.session['current_bet_id']
@@ -377,8 +377,9 @@ def signup(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
+            user = authenticate(username=username, password=raw_password, email=email)
             login(request, user)
             return redirect('home')
     else:

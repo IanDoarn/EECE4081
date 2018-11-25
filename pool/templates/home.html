@@ -54,7 +54,7 @@
                     {% for header in table_headers %}
                         <th scope="col">{{ header }}</th>
                     {% endfor %}
-                    <th scope="col">Bet On Game</th>
+{#                    <th scope="col">Bet On Game</th>#}
                 </tr>
                 </thead>
                 <tbody>
@@ -66,11 +66,11 @@
                             <td>{{ game.underdog.name }}</td>
                             <td>{{ game.tv }}</td>
                             <td>{{ game.date_time }}</td>
-                            <td>
-                                <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false">
-                                  Place Bet
-                                </button>
-                            </td>
+{#                            <td>#}
+{#                                <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false">#}
+{#                                  Place Bet#}
+{#                                </button>#}
+{#                            </td>#}
                         </tr>
                     {% endfor %}
                 </tbody>

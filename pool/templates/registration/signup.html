@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
   <div>
     <h2 class="cm-header">Sign up!</h2>
@@ -9,22 +9,20 @@
         <p><strong>Oh snap! </strong>Please fix the errors!</p>
     </div>
 {% endif %}
+    <div>
 
-  <form method="post">
+    </div>
+    <form method="post">
     {% csrf_token %}
     {% for field in form %}
       <div>
-        {{ field.label_tag }}<br>
-        {{ field }}
-        {% if field.help_text %}
-          <small style="color: grey">{{ field.help_text }}</small>
-        {% endif %}
+        {{ field|as_crispy_field }}
         {% for error in field.errors %}
           <p style="color: red">{{ error }}</p>
         {% endfor %}
       </div>
     {% endfor %}
-    <button type="submit">Sign up</button>
+    <button type="submit" class="btn btn-success">Sign up</button>
   </form>
 
 {% endblock %}
