@@ -8,6 +8,7 @@ class GameTable(tables.Table):
     favorite = tables.Column()
     spread = tables.Column()
     underdog = tables.Column()
+    date_time = tables.Column(verbose_name='Date / Time')
 
 
     def render_id(self, value, record):
