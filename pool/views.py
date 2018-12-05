@@ -360,7 +360,7 @@ def betpage(request):
             b.save()
 
             # del request.session['current_bet_id']
-            return redirect('games')
+            return redirect('home')
         else:
             # del request.session['current_bet_id']
             pass

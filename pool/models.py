@@ -101,7 +101,7 @@ class Bet(models.Model):
             self.team,
             self.game
         )
-        
+
 
 class Season(models.Model):
     name = models.CharField(max_length=128)
